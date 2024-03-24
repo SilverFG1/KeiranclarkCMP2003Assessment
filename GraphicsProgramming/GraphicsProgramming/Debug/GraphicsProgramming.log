@@ -1,5 +1,0 @@
-﻿  Scene.cpp
-SOIL.lib(image_DXT.obj) : warning LNK4099: PDB '' was not found with 'SOIL.lib(image_DXT.obj)' or at ''; linking object as if no debug info
-SOIL.lib(image_helper.obj) : warning LNK4099: PDB '' was not found with 'SOIL.lib(image_helper.obj)' or at ''; linking object as if no debug info
-SOIL.lib(stb_image_aug.obj) : warning LNK4099: PDB '' was not found with 'SOIL.lib(stb_image_aug.obj)' or at ''; linking object as if no debug info
-  GraphicsProgramming.vcxproj -> C:\Users\Keiran C\Documents\Uni\CMP203\Keiran Cark Assessment\GraphicsProgramming\Debug\GraphicsProgramming.exe
