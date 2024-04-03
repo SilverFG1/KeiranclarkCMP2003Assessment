@@ -6,7 +6,6 @@
 Skybox::Skybox()
 {
 
-
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	// Initialise scene variables
@@ -17,7 +16,6 @@ Skybox::Skybox()
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB |
 		SOIL_FLAG_COMPRESS_TO_DXT);
 	glBindTexture(GL_TEXTURE_2D, skybox);
-
 
 }
 
@@ -44,7 +42,6 @@ void Skybox::update()
 	up.y = cosP * cosR;
 	up.z = -sinY * sinR - sinP * cosR * -cosY;
 
-
 }
 
 void Skybox::render()
@@ -58,70 +55,84 @@ void Skybox::render()
 
 	glBindTexture(GL_TEXTURE_2D, skybox);
 	glBegin(GL_QUADS);
-
-
 	// front face
-	glTexCoord2f(0.0, 0.0);
-	glVertex3f(-size, size, size);
-	glTexCoord2f(1.0, 0.0);
-	glVertex3f(size, size, size);
-	glTexCoord2f(1.0, 1.0);
-	glVertex3f(size, -size, size);
-	glTexCoord2f(0.0, 1.0);
-	glVertex3f(-size, -size, size);
 
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glNormal3f(0.0f, 0.0f, -1.0f);
+	glTexCoord2f(0.25, 0.25);
+	glVertex3f(-size, size, size);
+	glTexCoord2f(0.50, 0.25);
+	glVertex3f(size, size, size);
+	glTexCoord2f(0.50, 0.50);
+	glVertex3f(size, -size, size);
+	glTexCoord2f(0.25, 0.50);
+	glVertex3f(-size, -size, size);
 	// back face
-	glTexCoord2f(1.0, 0.0);
-	glVertex3f(-size, size, -size);
-	glTexCoord2f(0.0, 0.0);
-	glVertex3f(size, size, -size);
-	glTexCoord2f(0.0, 1.0);
-	glVertex3f(size, -size, -size);
-	glTexCoord2f(1.0, 1.0);
-	glVertex3f(-size, -size, -size);
 
+
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(1, 0.25);
+	glVertex3f(-size, size, -size);
+	glTexCoord2f(0.75, 0.25);
+	glVertex3f(size, size, -size);
+	glTexCoord2f(0.75, 0.50);
+	glVertex3f(size, -size, -size);
+	glTexCoord2f(1, 0.50);
+	glVertex3f(-size, -size, -size);
 	// right face
-	glTexCoord2f(0.0, 0.0);
-	glVertex3f(size, size, size);
-	glTexCoord2f(1.0, 0.0);
-	glVertex3f(size, size, -size);
-	glTexCoord2f(1.0, 1.0);
-	glVertex3f(size, -size, -size);
-	glTexCoord2f(0.0, 1.0);
-	glVertex3f(size, -size, size);
 
+
+	glNormal3f(-1.0f, 0.0f, 0.0f);
+	glTexCoord2f(0.50, 0.25);
+	glVertex3f(size, size, size);
+	glTexCoord2f(0.75, 0.25);
+	glVertex3f(size, size, -size);
+	glTexCoord2f(0.75, 0.50);
+	glVertex3f(size, -size, -size);
+	glTexCoord2f(0.50, 0.50);
+	glVertex3f(size, -size, size);
 	// left face
-	glTexCoord2f(1.0, 0.0);
+
+
+	glNormal3f(1.0f, 0.0f, 0.0f);
+	glTexCoord2f(0.25, 0.25);
 	glVertex3f(-size, size, size);
-	glTexCoord2f(0.0, 0.0);
+	glTexCoord2f(0, 0.25);
 	glVertex3f(-size, size, -size);
-	glTexCoord2f(0.0, 1.0);
+	glTexCoord2f(0, 0.50);
 	glVertex3f(-size, -size, -size);
-	glTexCoord2f(1.0, 1.0);
+	glTexCoord2f(0.25, 0.50);
 	glVertex3f(-size, -size, size);
+
 
 	// bottom face
-	glTexCoord2f(0.0, 0.0);
-	glVertex3f(size, -size, size);
-	glTexCoord2f(0.0, 1.0);
-	glVertex3f(size, -size, -size);
-	glTexCoord2f(1.0, 1.0);
-	glVertex3f(-size, -size, -size);
-	glTexCoord2f(1.0, 0.0);
-	glVertex3f(-size, -size, size);
 
+
+	glNormal3f(0.0f, 1.0f, 0.0f);
+	glTexCoord2f(0.25, 0.75);
+	glVertex3f(size, -size, size);
+	glTexCoord2f(0.25, 0.50);
+	glVertex3f(size, -size, -size);
+	glTexCoord2f(0.50, 0.50);
+	glVertex3f(-size, -size, -size);
+	glTexCoord2f(0.50, 0.75);
+	glVertex3f(-size, -size, size);
 	// top face
-	glTexCoord2f(1.0, 0.0);
+
+
+	glNormal3f(0.0f, 1.0f, 0.0f);
+	glTexCoord2f(0.50, 0.25);
 	glVertex3f(size, size, size);
-	glTexCoord2f(1.0, 1.0);
+	glTexCoord2f(0.50, 0);
 	glVertex3f(size, size, -size);
-	glTexCoord2f(0.0, 1.0);
+	glTexCoord2f(0.25, 0);
 	glVertex3f(-size, size, -size);
-	glTexCoord2f(0.0, 0.0);
+	glTexCoord2f(0.25, 0.25);
 	glVertex3f(-size, size, size);
 
 	glEnd();
 	glEnable(GL_DEPTH_TEST);
+	glPopMatrix();
 	glPopMatrix();
 
 }

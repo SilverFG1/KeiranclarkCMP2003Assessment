@@ -1,4 +1,5 @@
 #include "glut.h"
+#include <vector>
 #include <GL/gl.h>
 #include <GL/glu.h>
 //#include <SOIL/SOIL.h>  // Include SOIL for image loading
@@ -20,6 +21,10 @@ GLfloat skyboxVertices[];
 
 bool CameraSwap = false;
 bool wireframeMode = false;
+
+const int Slices = 50;
+const int Stacks = 50;
+const float radius = 1.0f;
 
 
 // Scene constructor, initializes OpenGL
@@ -52,7 +57,7 @@ Scene::Scene(Input* in)
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
 
-	// Load the texture using SOIL (Simple OpenGL Image Library)
+	 //Load the texture using SOIL (Simple OpenGL Image Library)
 	myFloor = SOIL_load_OGL_texture
 	(
 		"gfx/grass.png",   // Replace with the actual path to your texture
@@ -198,7 +203,7 @@ void Scene::render()
 	// Enable depth test after rendering the skybox
 	glEnable(GL_DEPTH_TEST);
 
-	GLfloat Light_Ambient[] = { 1.3f, 1.3f, 1.3f, 1.0f };	//Sets ambient light intensity to a dim gray (0.3, 0.3, 0.3).
+	GLfloat Light_Ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };	//Sets ambient light intensity to a dim gray (0.3, 0.3, 0.3).
 	GLfloat Light_Diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };	//Sets diffuse light intensity to white (1.0, 1.0, 1.0).
 	GLfloat Light_Position[] = { 4.0f, -4.0f, 4.0f, 1.0f };	//Places the light source at coordinates (4, -4, 4).
 	GLfloat Spot_Direction[] = { 1.0f, -1.0f, 0.0f };
@@ -210,8 +215,22 @@ void Scene::render()
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Spot_Direction); // Set spotlight direction
 	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 250.0f);            // Set spotlight cutoff angle
 	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 60.0f);           // Set spotlight exponent
-	glEnable(GL_LIGHT0);                                    // Enable Light 0
+	glEnable(GL_LIGHT0);                                 // Enable Light 0
 
+	// Define properties of the blue light
+	GLfloat Blue_Light_Ambient[] = { 0.0f, 0.0f, 0.3f, 1.0f };    // Ambient light color (blue)
+	GLfloat Blue_Light_Diffuse[] = { 0.0f, 0.0f, 1.0f, 1.0f };    // Diffuse light color (blue)
+	GLfloat Blue_Light_Position[] = { 3.0f, 4.0f, 0.0f, 1.0f };  // Position of the blue light (above the pyramid)
+	GLfloat Blue_Spot_Direction[] = { 0.0f, -1.0f, 0.0f };         // Direction of the spotlight (pointing downwards)
+
+	// Set light properties for the blue light
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, Blue_Light_Diffuse);        // Set diffuse light color for the blue light
+	glLightfv(GL_LIGHT1, GL_POSITION, Blue_Light_Position);      // Set light position for the blue light
+	glLightfv(GL_LIGHT1, GL_AMBIENT, Blue_Light_Ambient);        // Set ambient light color for the blue light
+	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, Blue_Spot_Direction);// Set spotlight direction
+	glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0f);                  // Set spotlight cutoff angle
+	glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 60.0f);                // Set spotlight exponent
+	glEnable(GL_LIGHT1);
 
 	GLfloat floorpos[] = { -20, -2.0f, 20, -20, -2.0f, -20, 20, -1.0f, -20, 20, -2.0f , 20 };	//Defines a square floor with vertices at (-20, -1, -20), (20, -1, -20), (20, -1, 20), and (-20, -1, 20).
 
@@ -219,83 +238,10 @@ void Scene::render()
 	shadow.generateShadowMatrix(shadowmatrix, Light_Position, floorpos);
 
 
-	//// Define vertices for a cube
-	//GLfloat cubeVertices[] = 
-	//{
-	//	-0.5f, -0.5f, -0.5f, // Bottom-left-back vertex
-	//	 0.5f, -0.5f, -0.5f, // Bottom-right-back vertex
-	//	 0.5f,  0.5f, -0.5f, // Top-right-back vertex
-	//	-0.5f,  0.5f, -0.5f, // Top-left-back vertex
-
-	//	-0.5f, -0.5f,  0.5f, // Bottom-left-front vertex
-	//	 0.5f, -0.5f,  0.5f, // Bottom-right-front vertex
-	//	 0.5f,  0.5f,  0.5f, // Top-right-front vertex
-	//	-0.5f,  0.5f,  0.5f, // Top-left-front vertex
-	//};
-
-	//// Define indices for drawing triangles
-	//GLubyte cubeIndices[] = 
-	//{
-	//	// Back face
-	//	0, 1, 2,
-	//	0, 2, 3,
-
-	//	// Front face
-	//	4, 5, 6,
-	//	4, 6, 7,
-
-	//	// Left face
-	//	0, 3, 7,
-	//	0, 7, 4,
-
-	//	// Right face
-	//	1, 5, 6,
-	//	1, 6, 2,
-
-	//	// Bottom face
-	//	0, 1, 5,
-	//	0, 5, 4,
-
-	//	// Top face
-	//	2, 3, 7,
-	//	2, 7, 6,
-	//};
-
-	//// Draw the cube with texture
-	//glEnable(GL_DEPTH_TEST);
-
-	//glPushMatrix();  // Push the current matrix onto the stack
-	//glTranslatef(0.0f, -1.5f, 0.0f); // Translate along the y-axis
-	//glBindTexture(GL_TEXTURE_2D, myTexture); // Bind our texture
-
-	//// Define texture coordinates for the front face
-	//GLfloat frontFaceTextureCoordinates[] =
-	//{
-	//	0.0f, 0.0f,
-	//	1.0f, 0.0f,
-	//	1.0f, 1.0f,
-	//	0.0f, 1.0f,
-	//};
-
-	// Loop through all the cube indices to draw each face
-	//for (int i = 0; i < 6; i++) 
-	//{
-	//	int offset = i * 6;  // Offset for each face
-	//	glBegin(GL_QUADS);
-	//	for (int j = 0; j < 4; j++) 
-	//	{
-	//		glTexCoord2fv(&frontFaceTextureCoordinates[i * 2]);
-	//		glVertex3fv(&cubeVertices[(4 * 5 + i) * 3]); // Front face vertices start at index 20
-	//	}
-	//	glEnd();
-	//}
-
-	//glPopMatrix();
-
 	glDisable(GL_DEPTH_TEST);
 
 	// Define vertices for a pyramid
-	GLfloat pyramidVertices[] = 
+	GLfloat pyramidVertices[] =
 	{
 	-1.0f, -1.0f, -1.0f, // Base left-back vertex
 	 1.0f, -1.0f, -1.0f, // Base right-back vertex
@@ -306,7 +252,7 @@ void Scene::render()
 	};
 
 	// Define indices for drawing triangles
-	GLubyte pyramidIndices[] = 
+	GLubyte pyramidIndices[] =
 	{
 		// Base
 		0, 1, 2,
@@ -324,40 +270,43 @@ void Scene::render()
 	glRotatef(180, 1, 0, 0);
 	glEnable(GL_DEPTH_TEST);
 	glPushMatrix();  // Push the current matrix onto the stack
-	glTranslatef(0.0f, 0.f, 0.0f);
+	glTranslatef(0.0f, 0.f, 0.1f);
 	glBegin(GL_TRIANGLES);
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_DEPTH_TEST);
 
-	// Render the model
-	 
-	shadow.generateShadowMatrix(shadowmatrix, Light_Position, floorpos);
-
+	// Render model with shadow
+	glPushMatrix(); // Push matrix for model with shadow
+	// Shadow generation
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
-
-	glPushMatrix();
-	glMultMatrixf((GLfloat*)shadowmatrix);
-	
-	//translate to floor and draw shadow, remember to match any transforms on the object
-	glTranslatef(0.f, 0.f, 0.f);
-	glScalef(0.2f, 0.2f, 0.2f);
-	myModel.render();
-	glPopMatrix();
-
-	glColor3f(1.0f, 1.0f, 1.0f); // S
+	shadow.generateShadowMatrix(shadowmatrix, Light_Position, floorpos);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
-
-	glPushMatrix();
-	glTranslatef(0.f, 0.f, 0.f);
-
+	glPushMatrix(); // Push matrix for shadow rendering
+	glMultMatrixf((GLfloat*)shadowmatrix);
+	// Translate to floor and draw shadow
+	glTranslatef(0.0f, 0.0f, 0.1f);
 	glScalef(0.2f, 0.2f, 0.2f);
-	myModel.render();
-	glPopMatrix();
+	// Render model
+	glPopMatrix(); // Pop matrix for shadow rendering
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glPushMatrix(); // Push matrix for model rendering
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glScalef(0.2f, 0.2f, 0.2f);
+	// Render model
+	glPopMatrix(); // Pop matrix for model rendering
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glPopMatrix(); // Pop matrix for model with shadow
+
 
 	// Render the floor using glBegin and glEnd
 	glEnable(GL_TEXTURE_2D);
@@ -365,9 +314,9 @@ void Scene::render()
 
 	glEnable(GL_DEPTH_TEST);
 	glBegin(GL_QUADS);
-	for (float i = 20; i > -20; i = i - 0.1f) 
+	for (float i = 20; i > -20; i = i - 0.1f)
 	{
-		for (float j = 20; j > -20; j = j - 0.1f) 
+		for (float j = 20; j > -20; j = j - 0.1f)
 		{
 			// Set the normal vector for the floor (pointing upwards)
 			glNormal3f(0.0f, 1.0f, 0.0f);
@@ -385,7 +334,7 @@ void Scene::render()
 	// Draw the pyramid with red color
 	glEnable(GL_DEPTH_TEST);
 	glPushMatrix();  // Push the current matrix onto the stack
-	glTranslatef(0.0f, 4.0f, 0.0f);  // Translate along the y-axis
+	glTranslatef(3.0f, 3.0f, 0.0f);  // Translate along the y-axis
 	glBegin(GL_TRIANGLES);
 	glColor3f(1.0f, 0.0f, 0.0f); // Red color
 	for (int i = 0; i < 24; i++)
@@ -397,16 +346,334 @@ void Scene::render()
 	glDisable(GL_DEPTH_TEST);
 
 
-	// End render geometry --------------------------------------
+	// Define vertices for a cube
+	GLfloat cubeVertices[] =
+	{
+		// Front face
+		-1.0f, -1.0f,  1.0f, // Bottom left
+		 1.0f, -1.0f,  1.0f, // Bottom right
+		 1.0f,  1.0f,  1.0f, // Top right
+		-1.0f,  1.0f,  1.0f, // Top left
 
-	// Render text, should be last object rendered.
-	renderTextOutput();
+		// Back face
+		-1.0f, -1.0f, -1.0f, // Bottom left
+		 1.0f, -1.0f, -1.0f, // Bottom right
+		 1.0f,  1.0f, -1.0f, // Top right
+		-1.0f,  1.0f, -1.0f, // Top left
+	};
 
-	// Swap buffers, after all objects are rendered.
-	glutSwapBuffers();
+	// Define indices for drawing triangles
+	GLubyte cubeIndices[] =
+	{
+		// Front face
+		0, 1, 2,
+		2, 3, 0,
 
+		// Right face
+		1, 5, 6,
+		6, 2, 1,
+
+		// Back face
+		7, 6, 5,
+		5, 4, 7,
+
+		// Left face
+		4, 0, 3,
+		3, 7, 4,
+
+		// Top face
+		3, 2, 6,
+		6, 7, 3,
+
+		// Bottom face
+		4, 5, 1,
+		1, 0, 4,
+	};
+
+	// Draw the cube with yellow color
+	glEnable(GL_DEPTH_TEST);
+	glPushMatrix();  // Push the current matrix onto the stack
+	glTranslatef(3.0f, 1.0f, 0.0f);  // Translate along the y-axis
+	glColor3f(1.0f, 1.0f, 0.0f); // Yellow color
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < 36; i++)
+	{
+		glVertex3fv(&cubeVertices[cubeIndices[i] * 3]);
+	}
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_DEPTH_TEST);
+
+	// Draw the cube with yellow color
+	glEnable(GL_DEPTH_TEST);
+	glPushMatrix();  // Push the current matrix onto the stack
+	glTranslatef(3.0f, 1.0f, 0.0f);  // Translate along the y-axis
+	glColor3f(1.0f, 1.0f, 0.0f); // Yellow color
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < 36; i++)
+	{
+		glVertex3fv(&cubeVertices[cubeIndices[i] * 3]);
+	}
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_DEPTH_TEST);
+
+
+	float xOffset = -10.0f;
+	float yOffset = 1.0f;
+	float zOffset = -1.5f;
+
+	// Bind the texture
+	glBindTexture(GL_TEXTURE_2D, myTexture);
+	// Enable texture mapping
+	glEnable(GL_TEXTURE_2D);
+
+	glBegin(GL_QUADS);
+
+	for (int i = 0; i < Slices; ++i)
+	{
+		float theta1 = i * (2 * 3.14) / Slices;
+		float theta2 = (i + 1) * (2 * 3.14) / Slices;
+		for (int j = 0; j < Stacks; ++j)
+		{
+			float phi1 = j * 3.14 / Stacks;
+			float phi2 = (j + 1) * 3.14 / Stacks;
+
+			// Vertices of the quad
+			float x1 = (radius * sin(theta1) * sin(phi1)) + xOffset;
+			float y1 = (radius * cos(phi1)) + yOffset;
+			float z1 = (radius * cos(theta1) * sin(phi1)) + zOffset;
+
+			float x2 = (radius * sin(theta1) * sin(phi2)) + xOffset;
+			float y2 = (radius * cos(phi2)) + yOffset;
+			float z2 = (radius * cos(theta1) * sin(phi2)) + zOffset;
+
+			float x3 = (radius * sin(theta2) * sin(phi2)) + xOffset;
+			float y3 = (radius * cos(phi2)) + yOffset;
+			float z3 = (radius * cos(theta2) * sin(phi2)) + zOffset;
+
+			float x4 = (radius * sin(theta2) * sin(phi1)) + xOffset;
+			float y4 = (radius * cos(phi1)) + yOffset;
+			float z4 = (radius * cos(theta2) * sin(phi1)) + zOffset;
+
+			// Draw the quad
+			glVertex3f(x1, y1, z1);
+			glVertex3f(x2, y2, z2);
+			glVertex3f(x3, y3, z3);
+			glVertex3f(x4, y4, z4);
+		}
+	}
+
+	glEnd();
+
+	// Disable texture mapping after rendering the quads
+	glDisable(GL_TEXTURE_2D);
+
+
+	// Draw the star
+	glBindTexture(GL_TEXTURE_2D, myFloor);
+	glEnable(GL_TEXTURE_2D);
+
+	glBegin(GL_TRIANGLES);
+
+	//glLoadIdentity(); // Reset the modelview matrix
+	glTranslatef(0.0, 1.0, 1.5); // Translate the shape up by 1 unit along the y-axis
+
+	// Bottom pyramid
+	//glColor3f(1.0, 0.0, 0.0);  // Red
+	glVertex3f(0.0, -1.0, 0.0);
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+
+	glVertex3f(0.0, -1.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.5);
+	glVertex3f(0.0, 0.0, -0.5);
+
+	glVertex3f(0.0, -1.0, 0.0);
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.5);
+
+	glVertex3f(0.0, -1.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, -0.5);
+
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.5);
+
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, -0.5);
+
+	// Top pyramid
+	//glColor3f(0.0, 0.0, 1.0);  // Blue
+	glVertex3f(0.0, 1.0, 0.0);
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+
+	glVertex3f(0.0, 1.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.5);
+	glVertex3f(0.0, 0.0, -0.5);
+
+	glVertex3f(0.0, 1.0, 0.0);
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.5);
+
+	glVertex3f(0.0, 1.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, -0.5);
+
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.5);
+
+	glVertex3f(0.5, 0.0, 0.0);
+	glVertex3f(-0.5, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, -0.5);
+
+
+	glEnd();
+
+	// Disable texture mapping
+	glDisable(GL_TEXTURE_2D);
+
+	glFlush();
+
+	// Bind the texture
+	glBindTexture(GL_TEXTURE_2D, myTexture);
+	// Enable texture mapping
+	glEnable(GL_TEXTURE_2D);
+
+	glBegin(GL_QUAD_STRIP);
+
+	// Front face
+	glVertex3f(6.0f, 0.0f, 0.0f); // Bottom left
+	glVertex3f(10.0f, 0.0f, 0.0f); // Bottom right
+	glVertex3f(6.0f, 2.0f, 0.0f); // Top left
+	glVertex3f(10.0f, 2.0f, 0.0f); // Top right
+
+	// Right face
+	glVertex3f(10.0f, 0.0f, 0.0f); // Bottom front
+	glVertex3f(10.0f, 0.0f, -4.0f); // Bottom back
+	glVertex3f(10.0f, 2.0f, 0.0f); // Top front
+	glVertex3f(10.0f, 2.0f, -4.0f); // Top back
+
+	// Back face
+	glVertex3f(10.0f, 0.0f, -4.0f); // Bottom right
+	glVertex3f(6.0f, 0.0f, -4.0f); // Bottom left
+	glVertex3f(10.0f, 2.0f, -4.0f); // Top right
+	glVertex3f(6.0f, 2.0f, -4.0f); // Top left
+
+	// Left face
+	glVertex3f(6.0f, 0.0f, -4.0f); // Bottom back
+	glVertex3f(6.0f, 0.0f, 0.0f); // Bottom front
+	glVertex3f(6.0f, 2.0f, -4.0f); // Top back
+	glVertex3f(6.0f, 2.0f, 0.0f); // Top front
+
+	// Bottom face
+	glVertex3f(6.0f, 0.0f, -4.0f); // Back left
+	glVertex3f(10.0f, 0.0f, -4.0f); // Back right
+	glVertex3f(6.0f, 0.0f, 0.0f); // Front left
+	glVertex3f(10.0f, 0.0f, 0.0f); // Front right
+
+	glEnd();
+
+	// Disable texture mapping after rendering the quad strip
+	glDisable(GL_TEXTURE_2D);
+
+
+		// Set texture parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		// Push the current matrix onto the stack
+		glPushMatrix();
+		{
+			// Enable stencil test
+			glEnable(GL_STENCIL_TEST);
+			// Disable depth test and lighting
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_LIGHTING);
+
+			// Disable writing to color buffer
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+			// Set stencil function and operation for the first pass
+			glStencilFunc(GL_ALWAYS, 1, 1);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+			// Draw solid wall
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glBegin(GL_QUADS);
+			glVertex2f(-5.0f, -5.0f);
+			glVertex2f(5.0f, -5.0f);
+			glVertex2f(5.0f, 5.0f);
+			glVertex2f(-5.0f, 5.0f);
+			glEnd();
+			glDisable(GL_POLYGON_OFFSET_FILL);
+
+			// Re-enable depth test and restore color mask
+			glEnable(GL_DEPTH_TEST);
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+			// Set stencil function and operation for the second pass
+			glStencilFunc(GL_EQUAL, 1, 1);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+			// Draw the model inside the 'mirror'
+			glPushMatrix();
+			glScalef(0.5, -0.5, 0.5);
+			glTranslatef(1, 0, -1);
+			glRotatef(180.1f, 180.0f, 1, 0);
+
+			myModel.render();
+			glPopMatrix();
+
+			// Disable stencil test
+			glDisable(GL_STENCIL_TEST);
+			// Enable blending
+			glEnable(GL_BLEND);
+			glDisable(GL_LIGHTING);
+
+			// Set wall color with transparency
+			glColor4f(0.8f, 0.8f, 1.0f, 0.8f); // Wall colour
+			// Draw the wall
+			glBegin(GL_QUADS); // Wall
+			glVertex2f(-15.0f, -15.0f);
+			glVertex2f(15.0f, -15.0f);
+			glVertex2f(15.0f, 15.0f);
+			glVertex2f(-15.0f, 15.0f);
+			glEnd();
+
+			// Re-enable lighting and disable blending
+			glEnable(GL_LIGHTING);
+			glDisable(GL_BLEND);
+
+			// Draw the model outside the 'mirror'
+			glPushMatrix();
+			glScalef(0.5, -0.5, 0.5); // Flip vertically
+			glTranslatef(1, 0, 1);
+			glRotatef(180.0f, 180.0f, 1, 0);
+
+			myModel.render();
+			glPopMatrix();
+
+			// Pop the matrix from the stack
+			glPopMatrix();
+		}
+		glDisable(GL_BLEND); // Disable blending
+
+
+
+		// End render geometry --------------------------------------
+
+		// Render text, should be last object rendered.
+		renderTextOutput();
+
+		// Swap buffers, after all objects are rendered.
+		glutSwapBuffers();
 
 }
+	
+
 
 void Scene::initialiseOpenGL()
 {

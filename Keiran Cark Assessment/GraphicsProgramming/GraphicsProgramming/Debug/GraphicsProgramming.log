@@ -1,4 +1,6 @@
-﻿  Main.cpp
-  Scene.cpp
-  Generating Code...
+﻿  Scene.cpp
+C:\Users\Keiran C\Documents\Uni\CMP203\Keiran Cark Assessment\GraphicsProgramming\GraphicsProgramming\Scene.cpp(435,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Keiran C\Documents\Uni\CMP203\Keiran Cark Assessment\GraphicsProgramming\GraphicsProgramming\Scene.cpp(436,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Keiran C\Documents\Uni\CMP203\Keiran Cark Assessment\GraphicsProgramming\GraphicsProgramming\Scene.cpp(439,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Keiran C\Documents\Uni\CMP203\Keiran Cark Assessment\GraphicsProgramming\GraphicsProgramming\Scene.cpp(440,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   GraphicsProgramming.vcxproj -> C:\Users\Keiran C\Documents\Uni\CMP203\Keiran Cark Assessment\GraphicsProgramming\Debug\GraphicsProgramming.exe
